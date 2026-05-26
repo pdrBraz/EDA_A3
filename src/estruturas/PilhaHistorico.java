@@ -1,18 +1,24 @@
 package estruturas;
 
-import java.util.Stack;
 import model.Chamado;
 
 public class PilhaHistorico {
-    private Stack<Chamado> pilha = new Stack<>();
+    private Chamado chamados[] = new Chamado[100];
+    private int topo = -1;
 
     public void registrar(Chamado chamado) {
-        pilha.push(chamado);
+        if (topo >= chamados.length - 1) {
+            System.out.println("Pilha de historico cheia.");
+            return;
+        }
+
+        topo++;
+        chamados[topo] = chamado;
     }
 
     public void listar() {
-        for (int i = pilha.size() - 1; i >= 0; i--) {
-            System.out.println(pilha.get(i));
+        for (int i = topo; i >= 0; i--) {
+            System.out.println(chamados[i]);
         }
     }
 }

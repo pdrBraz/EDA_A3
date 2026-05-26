@@ -3,46 +3,31 @@ package estruturas;
 import model.Usuario;
 
 public class ListaUsuarios {
-    private class No {
-        Usuario usuario;
-        No proximo;
-
-        No(Usuario usuario) {
-            this.usuario = usuario;
-        }
-    }
-
-    private No inicio;
+    private Usuario usuarios[] = new Usuario[100];
+    private int quantidade = 0;
 
     public void adicionar(Usuario usuario) {
-        No novo = new No(usuario);
-        if (inicio == null) {
-            inicio = novo;
-        } else {
-            No atual = inicio;
-            while (atual.proximo != null) {
-                atual = atual.proximo;
-            }
-            atual.proximo = novo;
+        if (quantidade >= usuarios.length) {
+            System.out.println("Lista de usuarios cheia.");
+            return;
         }
+
+        usuarios[quantidade] = usuario;
+        quantidade++;
     }
 
     public Usuario buscarPorId(int id) {
-        No atual = inicio;
-        while (atual != null) {
-            if (atual.usuario.getId() == id) {
-                return atual.usuario;
+        for (int i = 0; i < quantidade; i++) {
+            if (usuarios[i].getId() == id) {
+                return usuarios[i];
             }
-            atual = atual.proximo;
         }
         return null;
     }
 
     public void listar() {
-        No atual = inicio;
-        while (atual != null) {
-            System.out.println(atual.usuario);
-            atual = atual.proximo;
+        for (int i = 0; i < quantidade; i++) {
+            System.out.println(usuarios[i]);
         }
     }
 }

@@ -3,43 +3,42 @@ package estruturas;
 import model.Chamado;
 
 public class ArvoreChamados {
-    private class No {
-        Chamado chamado;
-        No esquerda, direita;
-
-        No(Chamado chamado) {
-            this.chamado = chamado;
-        }
-    }
-
-    private No raiz;
+    private Chamado chamados[] = new Chamado[100];
 
     public void inserir(Chamado chamado) {
-        raiz = inserirRec(raiz, chamado);
-    }
+        int i = 0;
 
-    private No inserirRec(No atual, Chamado chamado) {
-        if (atual == null) return new No(chamado);
+        while (i < chamados.length) {
+            if (chamados[i] == null) {
+                chamados[i] = chamado;
+                return;
+            }
 
-        if (chamado.getCodigo() < atual.chamado.getCodigo()) {
-            atual.esquerda = inserirRec(atual.esquerda, chamado);
-        } else {
-            atual.direita = inserirRec(atual.direita, chamado);
+            if (chamado.getCodigo() < chamados[i].getCodigo()) {
+                i = 2 * i + 1;
+            } else {
+                i = 2 * i + 2;
+            }
         }
-        return atual;
+
+        System.out.println("Arvore de chamados cheia.");
     }
 
     public Chamado buscar(int codigo) {
-        return buscarRec(raiz, codigo);
-    }
+        int i = 0;
 
-    private Chamado buscarRec(No atual, int codigo) {
-        if (atual == null) return null;
-        if (atual.chamado.getCodigo() == codigo) return atual.chamado;
+        while (i < chamados.length && chamados[i] != null) {
+            if (chamados[i].getCodigo() == codigo) {
+                return chamados[i];
+            }
 
-        if (codigo < atual.chamado.getCodigo()) {
-            return buscarRec(atual.esquerda, codigo);
+            if (codigo < chamados[i].getCodigo()) {
+                i = 2 * i + 1;
+            } else {
+                i = 2 * i + 2;
+            }
         }
-        return buscarRec(atual.direita, codigo);
+
+        return null;
     }
 }

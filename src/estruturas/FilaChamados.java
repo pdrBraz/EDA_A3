@@ -1,27 +1,45 @@
 package estruturas;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import model.Chamado;
 
 public class FilaChamados {
-    private Queue<Chamado> fila = new LinkedList<>();
+    private Chamado chamados[] = new Chamado[100];
+    private int quantidade = 0;
 
     public void adicionar(Chamado chamado) {
-        fila.add(chamado);
+        if (quantidade >= chamados.length) {
+            System.out.println("Fila de chamados cheia.");
+            return;
+        }
+
+        chamados[quantidade] = chamado;
+        quantidade++;
     }
 
     public Chamado atender() {
-        return fila.poll();
+        if (estaVazia()) {
+            return null;
+        }
+
+        Chamado atendido = chamados[0];
+
+        for (int i = 0; i < quantidade - 1; i++) {
+            chamados[i] = chamados[i + 1];
+        }
+
+        quantidade--;
+        chamados[quantidade] = null;
+
+        return atendido;
     }
 
     public boolean estaVazia() {
-        return fila.isEmpty();
+        return quantidade == 0;
     }
 
     public void listar() {
-        for (Chamado c : fila) {
-            System.out.println(c);
+        for (int i = 0; i < quantidade; i++) {
+            System.out.println(chamados[i]);
         }
     }
 }
