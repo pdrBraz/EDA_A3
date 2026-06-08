@@ -3,42 +3,69 @@ package estruturas;
 import model.Chamado;
 
 public class ArvoreChamados {
-    private Chamado chamados[] = new Chamado[100];
+    private NodeChamado raiz;
+
+    private static class NodeChamado {
+        Chamado chamado;
+        NodeChamado e, d;
+
+        NodeChamado(Chamado c) {
+            this.chamado = c;
+            this.e = null;
+            this.d = null;
+        }
+    }
 
     public void inserir(Chamado chamado) {
-        int i = 0;
-
-        while (i < chamados.length) {
-            if (chamados[i] == null) {
-                chamados[i] = chamado;
+        if (raiz == null) {
+            raiz = new NodeChamado(chamado);
+            return;
+        }
+        NodeChamado t = raiz;
+        while (true) {
+            if (chamado.getCodigo() == t.chamado.getCodigo()) {
+                System.out.println("Chamado já existe com código: " + chamado.getCodigo());
                 return;
             }
-
-            if (chamado.getCodigo() < chamados[i].getCodigo()) {
-                i = 2 * i + 1;
+            if (chamado.getCodigo() < t.chamado.getCodigo()) {
+                if (t.e == null) { t.e = new NodeChamado(chamado); return; }
+                t = t.e;
             } else {
-                i = 2 * i + 2;
+                if (t.d == null) { t.d = new NodeChamado(chamado); return; }
+                t = t.d;
             }
         }
+    }
 
-        System.out.println("Arvore de chamados cheia.");
+    public void remover(int codigo) {
+        raiz = removerNo(raiz, codigo);
+    }
+
+    private NodeChamado removerNo(NodeChamado t, int codigo) {
+        if (t == null) return null;
+
+        if (codigo < t.chamado.getCodigo()) {
+            t.e = removerNo(t.e, codigo);
+        } else if (codigo > t.chamado.getCodigo()) {
+            t.d = removerNo(t.d, codigo);
+        } else {
+            if (t.e == null) return t.d;
+            if (t.d == null) return t.e;
+            NodeChamado sucessor = t.d;
+            while (sucessor.e != null) sucessor = sucessor.e;
+            t.chamado = sucessor.chamado;
+            t.d = removerNo(t.d, sucessor.chamado.getCodigo());
+        }
+        return t;
     }
 
     public Chamado buscar(int codigo) {
-        int i = 0;
-
-        while (i < chamados.length && chamados[i] != null) {
-            if (chamados[i].getCodigo() == codigo) {
-                return chamados[i];
-            }
-
-            if (codigo < chamados[i].getCodigo()) {
-                i = 2 * i + 1;
-            } else {
-                i = 2 * i + 2;
-            }
+        NodeChamado t = raiz;
+        while (t != null) {
+            if (codigo == t.chamado.getCodigo()) return t.chamado;
+            if (codigo < t.chamado.getCodigo()) t = t.e;
+            else t = t.d;
         }
-
         return null;
     }
 }
