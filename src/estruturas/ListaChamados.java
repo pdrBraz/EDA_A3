@@ -3,8 +3,17 @@ package estruturas;
 import model.Chamado;
 
 public class ListaChamados {
-    private Chamado chamados[] = new Chamado[100];
-    private int quantidade = 0;
+    private Node ini;
+
+    private static class Node {
+        Chamado chamado;
+        Node prox;
+
+        Node(Chamado c) {
+            this.chamado = c;
+            this.prox = null;
+        }
+    }
 
     private int pesoPrioridade(String prioridade) {
         if (prioridade.equalsIgnoreCase("Alta"))  return 3;
@@ -13,60 +22,80 @@ public class ListaChamados {
     }
 
     public void adicionar(Chamado chamado) {
-        if (quantidade >= chamados.length) {
-            System.out.println("Lista de chamados cheia.");
+        Node novo = new Node(chamado);
+        if (ini == null) {
+            ini = novo;
             return;
         }
-        chamados[quantidade] = chamado;
-        quantidade++;
-    }
-
-    public void removerPorCodigo(int codigo) {
-        for (int i = 0; i < quantidade; i++) {
-            if (chamados[i].getCodigo() == codigo) {
-                for (int j = i; j < quantidade - 1; j++) {
-                    chamados[j] = chamados[j + 1];
-                }
-                quantidade--;
-                chamados[quantidade] = null;
-                return;
-            }
+        // Anda até o final da lista e conecta o novo nó
+        Node t = ini;
+        while (t.prox != null) {
+            t = t.prox;
         }
+        t.prox = novo;
     }
 
     public Chamado atender() {
         if (estaVazia()) return null;
 
-        int indicePrioridade = 0;
-        for (int i = 1; i < quantidade; i++) {
-            if (pesoPrioridade(chamados[i].getPrioridade()) > pesoPrioridade(chamados[indicePrioridade].getPrioridade())) {
-                indicePrioridade = i;
+        // Busca o nó de maior prioridade e seu anterior
+        Node tMaior   = ini;
+        Node antMaior = null;
+        Node ant      = null;
+        Node t        = ini;
+
+        while (t != null) {
+            if (pesoPrioridade(t.chamado.getPrioridade()) > pesoPrioridade(tMaior.chamado.getPrioridade())) {
+                tMaior   = t;
+                antMaior = ant;
             }
+            ant = t;
+            t   = t.prox;
         }
 
-        Chamado atendido = chamados[indicePrioridade];
-
-        for (int i = indicePrioridade; i < quantidade - 1; i++) {
-            chamados[i] = chamados[i + 1];
+        // Remove o nó de maior prioridade da lista ligada
+        if (antMaior == null) {
+            ini = tMaior.prox; // era o primeiro nó
+        } else {
+            antMaior.prox = tMaior.prox; // pula o nó removido
         }
 
-        quantidade--;
-        chamados[quantidade] = null;
+        return tMaior.chamado;
+    }
 
-        return atendido;
+    public void removerPorCodigo(int codigo) {
+        if (estaVazia()) return;
+
+        Node ant = null;
+        Node t   = ini;
+
+        while (t != null) {
+            if (t.chamado.getCodigo() == codigo) {
+                if (ant == null) {
+                    ini = t.prox; // era o primeiro nó
+                } else {
+                    ant.prox = t.prox; // pula o nó removido
+                }
+                return;
+            }
+            ant = t;
+            t   = t.prox;
+        }
     }
 
     public boolean estaVazia() {
-        return quantidade == 0;
+        return ini == null;
     }
 
     public void listar() {
-        if (quantidade == 0) {
+        if (estaVazia()) {
             System.out.println("Nenhum chamado pendente.");
             return;
         }
-        for (int i = 0; i < quantidade; i++) {
-            System.out.println(chamados[i]);
+        Node t = ini;
+        while (t != null) {
+            System.out.println(t.chamado);
+            t = t.prox;
         }
     }
 }
